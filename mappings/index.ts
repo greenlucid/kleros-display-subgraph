@@ -5,6 +5,7 @@ import {
   NewPeriod as NewPeriodEv,
   Draw as DrawEv,
   TokenAndETHShift as TokenAndETHShiftEv,
+  StakeSet as StakeSetEv,
   Kleros,
 } from "../generated/Kleros/Kleros";
 import {
@@ -21,6 +22,7 @@ import {
   Evidence,
   EvidenceGroup,
   Round,
+  StakeSet,
   TokenAndETHShift,
 } from "../generated/schema";
 import { ADDRESS, ONE, ZERO, ZERO_B } from "./const";
@@ -162,6 +164,31 @@ export function handleTokenAndETHShift(ev: TokenAndETHShiftEv): void {
   shift.disputeID = ev.params._disputeID;
   shift.tokenAmount = ev.params._tokenAmount;
   shift.save();
+}
+
+export function handleStakeSet(ev: StakeSetEv): void {
+  // Keep rolling until we find a free ID
+  let i = 0;
+  while (true) {
+    const stakeSet = StakeSet.load(
+      `${ev.params._address.toHexString()}-${ev.params._subcourtID}-${i}`
+    );
+    if (stakeSet == null) break;
+    i++;
+  }
+
+  const stakeSet = new StakeSet(
+    `${ev.params._address.toHexString()}-${ev.params._subcourtID}-${i}`
+  );
+
+  stakeSet.address = ev.params._address;
+  stakeSet.subcourtID = ev.params._subcourtID;
+  stakeSet.stake = ev.params._stake;
+  stakeSet.newTotalStake = ev.params._newTotalStake;
+  stakeSet.timestamp = ev.block.timestamp;
+  stakeSet.blocknumber = ev.block.number;
+  stakeSet.logIndex = ev.logIndex;
+  stakeSet.save();
 }
 
 export function handleMetaEvidence(ev: MetaEvidenceEv): void {

@@ -56,6 +56,18 @@ type TokenAndETHShift @entity {
   tokenAmount: BigInt!
 }
 
+type StakeSet @entity {
+  "address-subcourtId-(discriminator)"
+  id: ID!
+  address: Bytes!
+  subcourtID: BigInt!
+  stake: BigInt!
+  newTotalStake: BigInt!
+  timestamp: BigInt!
+  blocknumber: BigInt!
+  logIndex: BigInt!
+}
+
 type EvidenceGroup @entity {
   id: Bytes!
   dispute: Dispute
